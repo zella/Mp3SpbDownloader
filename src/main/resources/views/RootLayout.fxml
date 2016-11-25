@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="447.0" prefWidth="352.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="downloadButton" layoutX="273.0" layoutY="38.0" mnemonicParsing="false" text="Download" AnchorPane.rightAnchor="14.0" />
+      <Label layoutX="14.0" layoutY="14.0" text="Album link" />
+      <Label layoutX="193.0" layoutY="14.0" text="Save to" AnchorPane.rightAnchor="166.0" />
+      <TextField fx:id="albumTextField" layoutX="14.0" layoutY="38.0" minWidth="-Infinity" prefWidth="200.0" promptText="album link" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="230.0" />
+      <TextField fx:id="saveFolderTextField" layoutX="154.0" layoutY="38.0" minHeight="-Infinity" prefHeight="26.0" prefWidth="102.0" promptText="downloads folder" AnchorPane.rightAnchor="109.0" />
+      <TableView fx:id="downloadsTable" fixedCellSize="0.0" layoutX="14.0" layoutY="71.0" prefHeight="357.0" prefWidth="339.0" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="74.0">
+        <columns>
+          <TableColumn editable="false" minWidth="30.0" prefWidth="241.0" sortable="false" text="Songs" />
+          <TableColumn editable="false" minWidth="7.0" prefWidth="147.0" resizable="false" sortable="false" text="Status" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </children>
+</AnchorPane>

@@ -62,18 +62,21 @@ public class Engine {
 
     private Tuple2<Path, Path> tmpAndCompletePath(AlbumInfo albumInfo, Map.Entry<Integer, SongInfo> numSongEntry, Path downloadsFolder) throws IOException {
 
-        ensureFoldersExist(albumInfo, downloadsFolder);
+        AlbumPaths albumPaths = AlbumPaths.fromAlbumInfo(albumInfo);
+
+        ensureFoldersExist(albumPaths, downloadsFolder);
 
         final Integer num = numSongEntry.getKey();
         final SongInfo songInfo = numSongEntry.getValue();
 
         final String tmpPath =
-          albumInfo.artist()
+          albumPaths.artist
             + File.separator
-            + albumInfo.year() + " " + albumInfo.title()
+            + albumPaths.album
             + File.separator
             // < 99 support
-            + (num < 10 ? "0" + num.toString() : num.toString()) + " " + songInfo.name();
+            + (num < 10 ? "0" + num.toString() : num.toString()) + " " + songInfo.name()
+            .replaceAll("[\\\\/:*?\"<>|]", " ").trim();
 
         final String completePath = tmpPath + ".mp3";
 
@@ -83,16 +86,33 @@ public class Engine {
         );
     }
 
-    private void ensureFoldersExist(AlbumInfo albumInfo, Path downloadsFolder) throws IOException {
+    private void ensureFoldersExist(AlbumPaths albumPaths, Path downloadsFolder) throws IOException {
         if (!Files.exists(downloadsFolder))
             Files.createDirectory(downloadsFolder);
-        String albumFolder = albumInfo.year() + " " + albumInfo.title();
 
-        if (!Files.exists(downloadsFolder.resolve(albumInfo.artist())))
-            Files.createDirectory(downloadsFolder.resolve(albumInfo.artist()));
+        if (!Files.exists(downloadsFolder.resolve(albumPaths.artist)))
+            Files.createDirectory(downloadsFolder.resolve(albumPaths.artist));
 
-        if (!Files.exists(downloadsFolder.resolve(albumInfo.artist()).resolve(albumFolder)))
-            Files.createDirectory(downloadsFolder.resolve(albumInfo.artist()).resolve(albumFolder));
+        if (!Files.exists(downloadsFolder.resolve(albumPaths.artist).resolve(albumPaths.album)))
+            Files.createDirectory(downloadsFolder.resolve(albumPaths.artist).resolve(albumPaths.album));
+    }
+
+    private static class AlbumPaths {
+        private final String artist;
+        private final String album;
+
+        private AlbumPaths(String artist, String album) {
+            this.artist = artist;
+            this.album = album;
+        }
+
+        static AlbumPaths fromAlbumInfo(AlbumInfo albumInfo) {
+            return new AlbumPaths(
+              albumInfo.artist().replaceAll("[\\\\/:*?\"<>|]", " ").trim(),
+              albumInfo.year() + " " + albumInfo.title().replaceAll("[\\\\/:*?\"<>|]", " ").trim()
+            );
+        }
+
     }
 
 

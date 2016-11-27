@@ -1,6 +1,5 @@
 # Mp3SpbDownloader
-Desktop cross platform java(require java 8 installed) application, that helps download full albums from musicmp3spb.org. Not official. Just my project for fun. (alpha version)
-
+Desktop cross platform java (require java 8 installed) application, that helps download full albums from musicmp3spb.org. Not official. Just my project for fun.
 
 ![Logo](screenshots/screen_osx.png)
 

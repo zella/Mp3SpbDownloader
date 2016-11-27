@@ -6,7 +6,7 @@ Desktop cross platform java(require java 8 installed) application, that helps do
 
 ## How to run:
 
-Download `mp3spb-downloader-assembly-x.jar` from "releases"
+Download `mp3spb-downloader-assembly-x.jar` from [releases](https://github.com/zella/Mp3SpbDownloader/releases)
 
 Click on jar file, like regular executables.
 

@@ -1,6 +1,7 @@
 package org.zella.core
 
 import java.nio.file.{Files, Paths}
+import java.util.concurrent.Executors
 
 import com.google.common.truth.Truth.assertThat
 import okhttp3.OkHttpClient
@@ -41,7 +42,7 @@ class DownloadQueueTest {
 
     val fileDownloader = FileDownloader(okHttp)
 
-    val downloadQueue = DownloadQueue(fileDownloader)
+    val downloadQueue = DownloadQueue(fileDownloader, Executors.newSingleThreadExecutor())
     val download1 = downloadQueue.addDownload(URL_1, tmp1, done1, "someId1")
     val download2 = downloadQueue.addDownload(URL_2, tmp2, done2, "someId2")
     val download3 = downloadQueue.addDownload(URL_3, tmp3, done3, "someId3")

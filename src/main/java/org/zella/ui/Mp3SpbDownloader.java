@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
@@ -118,7 +119,7 @@ public class Mp3SpbDownloader extends Application {
                 if (!saveFolder.equals(saveFolderTextField.getText()))
                     prefs.put(PREF_FOLDER, saveFolderTextField.getText());
                 Platform.exit();
-                System.exit(0);
+//                System.exit(0);
             });
 
 
@@ -145,7 +146,12 @@ public class Mp3SpbDownloader extends Application {
 
         FileDownloader fileDownloader = FileDownloader.apply(httpClient, 1024 * 32);
 
-        DownloadQueue downloadQueue = DownloadQueue.apply(fileDownloader, Executors.newFixedThreadPool(2));
+        DownloadQueue downloadQueue = DownloadQueue.apply(fileDownloader,
+                Executors.newFixedThreadPool(2, r -> {
+                    Thread t = Executors.defaultThreadFactory().newThread(r);
+                    t.setDaemon(true);
+                    return t;
+                }));
 
         engine = new Engine(webClient,
                 mp3SpbWebCrawler,

@@ -18,9 +18,8 @@ object FileDownloader {
 
   def apply(
              okHttpClient: OkHttpClient,
-             progressPeriodBytes: Long = 10000,
-             internalBufferBytes: Long = 2048
-           ): FileDownloader = new FileDownloader(okHttpClient, progressPeriodBytes, internalBufferBytes)
+             internalBufferBytes: Long = 8192
+           ): FileDownloader = new FileDownloader(okHttpClient, internalBufferBytes)
 
 
   trait DownloadProgress
@@ -36,7 +35,7 @@ object FileDownloader {
 }
 
 
-class FileDownloader private(okHttpClient: OkHttpClient, progressPeriodBytes: Long, internalBufferBytes: Long) {
+class FileDownloader private(okHttpClient: OkHttpClient, internalBufferBytes: Long) {
 
   import org.zella.io.FileDownloader._
 
@@ -89,6 +88,8 @@ class FileDownloader private(okHttpClient: OkHttpClient, progressPeriodBytes: Lo
   private def handleWrites(fileSink: BufferedSink, body: ResponseBody, emitter: ObservableEmitter[DownloadProgress], location: Path, isCanceled: AtomicBoolean) {
     val contentLength = body.contentLength()
 
+    val progressPeriodBytes = contentLength / 100
+
     var totalBytes = 0L
     var readBytes = 0L
     var progressLimitBytes = 0L
@@ -104,7 +105,7 @@ class FileDownloader private(okHttpClient: OkHttpClient, progressPeriodBytes: Lo
       totalBytes += readBytes
       if (totalBytes > progressLimitBytes) {
         progressLimitBytes += progressPeriodBytes
-        fileSink.flush()
+        fileSink.emit()
         emitter.onNext(PartialDownload(totalBytes, contentLength, location))
       }
     }

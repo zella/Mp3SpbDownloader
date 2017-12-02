@@ -16,9 +16,12 @@ import org.zella.io.FileDownloader.{CompletedDownload, DownloadProgress}
   * @author zella.
   */
 object DownloadQueue {
+
+  lazy val defaultExecutor: Executor = Executors.newSingleThreadExecutor()
+
   def apply(
              downloader: FileDownloader,
-             executor: Executor = Executors.newSingleThreadExecutor()
+             executor: Executor = defaultExecutor
            ): DownloadQueue = new DownloadQueue(downloader, executor)
 
   /**

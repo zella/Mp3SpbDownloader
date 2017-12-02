@@ -40,19 +40,23 @@ public class Engine {
 
     public Observable<Tuple2<DownloadQueue.DownloadInfo, FileDownloader.DownloadProgress>> downloadAlbum(AlbumInfo albumInfo, Path downloadFolder) {
         return
-          Observable.fromIterable(albumInfo.songs().entrySet())
-            .flatMap(numSongEntry -> tempFileWebCrawler
-              .clickButtonAsync(webClient.getPage(numSongEntry.getValue().downloadLink()))
-              .flatMap(tempFileWebCrawler::clickDownloadLinkAsync)
-              .flatMap(downloadLink -> {
-                  Tuple2<Path, Path> paths = tmpAndCompletePath(albumInfo, numSongEntry, downloadFolder);
-                  return downloadQueue.addDownload(
-                    downloadLink,
-                    paths._1(),
-                    paths._2(),
-                    downloadId(albumInfo, numSongEntry.getKey(), numSongEntry.getValue())
-                  );
-              }));
+                Observable.fromIterable(albumInfo.songs().entrySet())
+                        .flatMap(numSongEntry -> tempFileWebCrawler
+                                .clickButtonAsync(webClient.getPage(numSongEntry.getValue().downloadLink()))
+                                .flatMap(tempFileWebCrawler::clickDownloadLinkAsync)
+                                .flatMap(downloadLink -> {
+                                    Tuple2<Path, Path> paths = tmpAndCompletePath(albumInfo, numSongEntry, downloadFolder);
+                                    return downloadQueue.addDownload(
+                                            downloadLink,
+                                            paths._1(),
+                                            paths._2(),
+                                            downloadId(albumInfo, numSongEntry.getKey(), numSongEntry.getValue())
+                                    );
+                                }));
+    }
+
+    public void close(){
+        webClient.close();
     }
 
     public static String downloadId(AlbumInfo albumInfo, Integer num, SongInfo songInfo) {
@@ -70,19 +74,19 @@ public class Engine {
         final SongInfo songInfo = numSongEntry.getValue();
 
         final String tmpPath =
-          albumPaths.artist
-            + File.separator
-            + albumPaths.album
-            + File.separator
-            // < 99 support
-            + (num < 10 ? "0" + num.toString() : num.toString()) + " " + songInfo.name()
-            .replaceAll("[\\\\/:*?\"<>|]", " ").trim();
+                albumPaths.artist
+                        + File.separator
+                        + albumPaths.album
+                        + File.separator
+                        // < 99 support
+                        + (num < 10 ? "0" + num.toString() : num.toString()) + " " + songInfo.name()
+                        .replaceAll("[\\\\/:*?\"<>|]", " ").trim();
 
         final String completePath = tmpPath + ".mp3";
 
         return new Tuple2<>(
-          Paths.get(downloadsFolder.toAbsolutePath().toString(), tmpPath),
-          Paths.get(downloadsFolder.toAbsolutePath().toString(), completePath)
+                Paths.get(downloadsFolder.toAbsolutePath().toString(), tmpPath),
+                Paths.get(downloadsFolder.toAbsolutePath().toString(), completePath)
         );
     }
 
@@ -107,9 +111,11 @@ public class Engine {
         }
 
         static AlbumPaths fromAlbumInfo(AlbumInfo albumInfo) {
+
             return new AlbumPaths(
-              albumInfo.artist().replaceAll("[\\\\/:*?\"<>|]", " ").trim(),
-              albumInfo.year() + " " + albumInfo.title().replaceAll("[\\\\/:*?\"<>|]", " ").trim()
+                    albumInfo.artist().replaceAll("[\\\\/:*?\"<>|]", " ").trim(),
+                    (albumInfo.year() + " " + albumInfo.title().replaceAll("[\\\\/:*?\"<>|]", " ").trim())
+                            .trim()
             );
         }
 

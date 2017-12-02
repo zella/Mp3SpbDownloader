@@ -4,7 +4,7 @@ import java.util.logging.Level
 
 import com.gargoylesoftware.htmlunit.{BrowserVersion, WebClient}
 import com.google.common.truth.Truth._
-import org.junit.{After, Before, Test}
+import org.junit.{After, Before, Ignore, Test}
 
 /**
   * @author zella.
@@ -23,6 +23,7 @@ class TempFileWebCrawlerTest {
   }
 
   @Test
+  @Ignore("only for debugging proposes")
   def clickButton() {
     val webCrawler = new TempFileWebCrawler(webClient)
     //TODO move webClient.getPage(VALID_DOWNLOAD_LINK) to TempFileWebCrawler
@@ -31,6 +32,7 @@ class TempFileWebCrawlerTest {
   }
 
   @Test
+  @Ignore("only for debugging proposes")
   def clickDownLoadLink() {
     val webCrawler = new TempFileWebCrawler(webClient)
 

@@ -46,10 +46,12 @@ public class Mp3SpbDownloader extends Application {
     private TextField saveFolderTextField;
     private TableView<DownloadUiItem> downloadsTable;
 
+    private String saveFolder = "";
+
     private final Engine engine = initEngine();
 
     private final ObservableList<DownloadUiItem> data =
-      FXCollections.observableArrayList();
+            FXCollections.observableArrayList();
 
 
     /**
@@ -73,49 +75,48 @@ public class Mp3SpbDownloader extends Application {
             downloadsTable.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("progress"));
             downloadsTable.setItems(data);
 
-            saveFolderTextField.setText(
-              prefs.get(PREF_FOLDER, System.getProperty("user.home") + File.separator + "mp3spb")
-            );
+            saveFolder = prefs.get(PREF_FOLDER, System.getProperty("user.home") + File.separator + "mp3spb");
+            saveFolderTextField.setText(saveFolder);
 
             downloadButton.setOnAction(event -> {
 
                 downloadButton.setDisable(true);
                 engine.albumInfo(albumTextField.getText())
-                  .subscribeOn(Schedulers.io())
-                  .doOnNext(albumInfo -> {
-                      albumInfo.songs().forEach((num, songInfo) -> {
-                          data.add(new DownloadUiItem(Engine.downloadId(albumInfo, num, songInfo), num.toString() + " " + songInfo.name(), "waiting..."));
-                      });
-                      downloadButton.setDisable(false);
-                      albumTextField.clear();
-                  })
-                  .flatMap(albumInfo -> engine.downloadAlbum(albumInfo, Paths.get(saveFolderTextField.getText())))
-                  .subscribe(infoAndProgress -> {
-                        DownloadQueue.DownloadInfo info = infoAndProgress._1();
-                        FileDownloader.DownloadProgress progress = infoAndProgress._2();
+                        .subscribeOn(Schedulers.io())
+                        .doOnNext(albumInfo -> {
+                            albumInfo.songs().forEach((num, songInfo) -> {
+                                data.add(new DownloadUiItem(Engine.downloadId(albumInfo, num, songInfo), num.toString() + " " + songInfo.name(), "waiting..."));
+                            });
+                            downloadButton.setDisable(false);
+                            albumTextField.clear();
+                        })
+                        .flatMap(albumInfo -> engine.downloadAlbum(albumInfo, Paths.get(saveFolderTextField.getText())))
+                        .subscribe(infoAndProgress -> {
+                                    DownloadQueue.DownloadInfo info = infoAndProgress._1();
+                                    FileDownloader.DownloadProgress progress = infoAndProgress._2();
 
-                        //TODO scala, pattern matching
-                        if (progress instanceof FileDownloader.StartDownload) {
+                                    if (progress instanceof FileDownloader.StartDownload) {
 
-                        } else if (progress instanceof FileDownloader.CompletedDownload) {
-                            find(data, info.downloadId()).setProgress("ok");
-                        } else if (progress instanceof FileDownloader.PartialDownload) {
-                            find(data, info.downloadId()).setProgress(percent((FileDownloader.PartialDownload) progress));
-                        } else if (progress instanceof FileDownloader.CancelDownload) {
-                            System.out.println(info.location() + " canceled");
-                        }
+                                    } else if (progress instanceof FileDownloader.CompletedDownload) {
+                                        find(data, info.downloadId()).setProgress("ok");
+                                    } else if (progress instanceof FileDownloader.PartialDownload) {
+                                        find(data, info.downloadId()).setProgress(percent((FileDownloader.PartialDownload) progress));
+                                    } else if (progress instanceof FileDownloader.CancelDownload) {
+                                        System.out.println(info.location() + " canceled");
+                                    }
 
-                        downloadsTable.refresh();
-                    },
-                    throwable -> {
-                        throwable.printStackTrace();
-                        downloadButton.setDisable(false);
-                    });
+                                    downloadsTable.refresh();
+                                },
+                                throwable -> {
+                                    throwable.printStackTrace();
+                                    downloadButton.setDisable(false);
+                                });
 
             });
 
             primaryStage.setOnCloseRequest(e -> {
-                prefs.put(PREF_FOLDER, saveFolderTextField.getText());
+                if (!saveFolder.equals(saveFolderTextField.getText()))
+                    prefs.put(PREF_FOLDER, saveFolderTextField.getText());
                 Platform.exit();
                 System.exit(0);
             });
@@ -137,20 +138,19 @@ public class Mp3SpbDownloader extends Application {
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
         webClient.getOptions().setCssEnabled(false);
-        webClient.getOptions().setAppletEnabled(false);
         java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
 
         IMp3SpbWebCrawler mp3SpbWebCrawler = new Mp3SpbWebCrawler(webClient);
         ITempFileWebCrawler tempFileWebCrawler = new TempFileWebCrawler(webClient);
 
-        FileDownloader fileDownloader = FileDownloader.apply(httpClient, 150000, 32768);
+        FileDownloader fileDownloader = FileDownloader.apply(httpClient, 1024 * 32);
 
         DownloadQueue downloadQueue = DownloadQueue.apply(fileDownloader, Executors.newFixedThreadPool(2));
 
         engine = new Engine(webClient,
-          mp3SpbWebCrawler,
-          tempFileWebCrawler,
-          downloadQueue
+                mp3SpbWebCrawler,
+                tempFileWebCrawler,
+                downloadQueue
         );
         return engine;
     }
@@ -178,10 +178,10 @@ public class Mp3SpbDownloader extends Application {
 
     private DownloadUiItem find(Collection<DownloadUiItem> items, String downloadId) {
         return items.stream()
-          .filter(item -> item.downloadId.equals(downloadId))
-          .findFirst()
-          //TODO npe
-          .get();
+                .filter(item -> item.downloadId.equals(downloadId))
+                .findFirst()
+                //TODO npe
+                .get();
     }
 
     public static class DownloadUiItem {

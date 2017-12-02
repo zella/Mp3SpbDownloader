@@ -42,6 +42,7 @@ class Mp3SpbWebCrawler(webClient: WebClient) extends IMp3SpbWebCrawler {
 
     val (name, year) = nameDiv.asText().split("\n") match {
       case Array(n, y) => (n.trim, y.trim)
+      case other => (other.head, "")
     }
 
     val artist = albumPage.querySelector("#cntCenter > h1:nth-child(1) > a")

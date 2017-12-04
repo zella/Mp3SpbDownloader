@@ -3,7 +3,7 @@ Desktop cross platform java (require java 8 installed) application, that helps d
 
 ![Logo](screenshots/screen_osx.png)
 
-Отблагодарить и поспособствовать развитию можно так
+Отблагодарить и поспособствовать развитию можно так / donations
 
 [![paypal](https://www.paypalobjects.com/ru_RU/RU/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=SPZGKGBD4ZW6Q&lc=RU&item_name=zella&currency_code=RUB&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted)
 

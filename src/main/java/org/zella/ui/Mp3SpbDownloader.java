@@ -83,7 +83,7 @@ public class Mp3SpbDownloader extends Application {
 
                 downloadButton.setDisable(true);
                 engine.albumInfo(albumTextField.getText())
-                        .subscribeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.single())
                         .doOnNext(albumInfo -> {
                             albumInfo.songs().forEach((num, songInfo) -> {
                                 data.add(new DownloadUiItem(Engine.downloadId(albumInfo, num, songInfo), num.toString() + " " + songInfo.name(), "waiting..."));

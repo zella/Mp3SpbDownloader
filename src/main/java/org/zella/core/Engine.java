@@ -2,6 +2,7 @@ package org.zella.core;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import io.reactivex.Observable;
+import org.zella.internals.RetryWithDelay;
 import org.zella.io.FileDownloader;
 import org.zella.web.AlbumInfo;
 import org.zella.web.IMp3SpbWebCrawler;
@@ -25,7 +26,6 @@ public class Engine {
     private final IMp3SpbWebCrawler mp3SpbWebCrawler;
     private final ITempFileWebCrawler tempFileWebCrawler;
     private final DownloadQueue downloadQueue;
-
 
     public Engine(WebClient webClient, IMp3SpbWebCrawler mp3SpbWebCrawler, ITempFileWebCrawler tempFileWebCrawler, DownloadQueue downloadQueue) {
         this.webClient = webClient;
@@ -52,10 +52,10 @@ public class Engine {
                                             paths._2(),
                                             downloadId(albumInfo, numSongEntry.getKey(), numSongEntry.getValue())
                                     );
-                                }));
+                                }).retryWhen(new RetryWithDelay(6, 10000)));
     }
 
-    public void close(){
+    public void close() {
         webClient.close();
     }
 

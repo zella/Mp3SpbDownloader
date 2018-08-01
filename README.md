@@ -1,3 +1,5 @@
+Site is down. Bye - Bye. :'(
+
 # Mp3SpbDownloader
 Desktop cross platform java (require java 8 installed) application, that helps download full albums from musicmp3spb.org. Not official. Just my project for fun.
 
